@@ -19,14 +19,18 @@
                 Query = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.QueryString) ?? string.Empty,
             };
 
-            var context = new CgiContext();
-
-            context.Request = new HttpRequestMessage(
-                new HttpMethod(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestMethod) ?? string.Empty),
-                requestUri.Uri);
-
             var httpVersion = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ServerProtocol) ?? "HTTP/1.1";
-            context.Request.Version = new Version(httpVersion.Substring(5));
+
+
+            var context = new CgiContext
+            {
+                Request = new HttpRequestMessage(
+                    new HttpMethod(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestMethod) ?? string.Empty),
+                    requestUri.Uri)
+                {
+                    Version = new Version(httpVersion.Substring(5)),
+                }
+            };
 
             GetContent(context.Request);
 

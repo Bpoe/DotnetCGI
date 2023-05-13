@@ -1,6 +1,10 @@
 ﻿namespace Dotnet.Cgi
 {
+    using Newtonsoft.Json;
     using System;
+    using System.ComponentModel.Design.Serialization;
+    using System.Net;
+    using System.Net.Http.Headers;
 
     public static class HttpMessageExtensions
     {
@@ -31,10 +35,20 @@
             if (response.Content != null)
             {
                 var content = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine("Content-Length: {0}", content.Length);
                 Console.WriteLine();
                 Console.WriteLine(content);
             }
+        }
+
+        public static void StatusCodeResult(this HttpResponseMessage response, HttpStatusCode statusCode, object content)
+        {
+            var contentString = JsonConvert.SerializeObject(content);
+            response.StatusCode = statusCode;
+            response.Content = new StringContent(
+                contentString,
+                new MediaTypeHeaderValue("application/json"));
+
+            response.Content.Headers.ContentLength = contentString.Length;
         }
     }
 }
