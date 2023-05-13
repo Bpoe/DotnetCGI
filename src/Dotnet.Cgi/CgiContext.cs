@@ -32,6 +32,8 @@
 
             LoadHttpHeadersFromEnvironment(context.Request.Headers);
 
+            context.Response.RequestMessage = context.Request;
+
             return context;
         }
 

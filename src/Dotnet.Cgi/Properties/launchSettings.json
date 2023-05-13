@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Dotnet.Cgi": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "REQUEST_METHOD": "Get"
+      }
+    }
+  }
+}

@@ -16,4 +16,4 @@ context.Response.StatusCode = HttpStatusCode.BadRequest;
 context.Response.Content = new StringContent(responseContent.ToString(), new MediaTypeHeaderValue("application/json"));
 context.Response.Headers.Add("foo", "bar");
 
-Result.WriteResponse(context.Response);
+context.Response.WriteToConsole();
