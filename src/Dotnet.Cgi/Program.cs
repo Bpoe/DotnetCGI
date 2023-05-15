@@ -12,6 +12,6 @@ var responseContent = new JObject
 };
 
 context.Response.StatusCodeResult(HttpStatusCode.BadRequest, responseContent);
-context.Response.Headers.Add("foo", "bar");
+context.Response.Headers.Add("X-foo", "bar");
 
 context.Response.WriteToConsole();
