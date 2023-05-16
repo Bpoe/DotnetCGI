@@ -1,85 +1,87 @@
-﻿namespace Dotnet.Cgi
+﻿namespace Dotnet.Cgi;
+
+using Dotnet.Cgi;
+using System;
+using System.Net.Http.Headers;
+
+public class CgiContext
 {
-    using System;
-    using System.Net.Http.Headers;
-
-    public class CgiContext
+    public static CgiContext GetInstance()
     {
-        public HttpRequestMessage Request { get; set; }
-
-        public HttpResponseMessage Response { get; set; } = new HttpResponseMessage();
-
-        public static CgiContext GetInstance()
+        var requestUri = new UriBuilder()
         {
-            var requestUri = new UriBuilder()
+            Port = int.Parse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ServerPort) ?? "0"),
+            Path = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestUri)
+                ?? Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ScriptName) + Environment.GetEnvironmentVariable(CgiEnvironmentVariable.PathInfo),
+            Query = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.QueryString) ?? string.Empty,
+        };
+
+        var httpVersion = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ServerProtocol) ?? "HTTP/1.1";
+
+        var context = new CgiContext(
+            new HttpRequestMessage(
+                new HttpMethod(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestMethod) ?? string.Empty),
+                requestUri.Uri)
             {
-                Port = int.Parse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ServerPort) ?? "0"),
-                Path = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestUri)
-                    ?? Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ScriptName) + Environment.GetEnvironmentVariable(CgiEnvironmentVariable.PathInfo),
-                Query = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.QueryString) ?? string.Empty,
-            };
+                Version = new Version(httpVersion.Substring(5)),
+            });
 
-            var httpVersion = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ServerProtocol) ?? "HTTP/1.1";
+        GetContent(context.Request);
 
+        LoadHttpHeadersFromEnvironment(context.Request.Headers);
 
-            var context = new CgiContext
-            {
-                Request = new HttpRequestMessage(
-                    new HttpMethod(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestMethod) ?? string.Empty),
-                    requestUri.Uri)
-                {
-                    Version = new Version(httpVersion.Substring(5)),
-                }
-            };
+        context.Response.RequestMessage = context.Request;
 
-            GetContent(context.Request);
+        return context;
+    }
 
-            LoadHttpHeadersFromEnvironment(context.Request.Headers);
+    public CgiContext(HttpRequestMessage Request)
+    {
+        this.Request = Request ?? throw new ArgumentNullException(nameof(Request));
+    }
 
-            context.Response.RequestMessage = context.Request;
+    public HttpRequestMessage Request { get; set; }
 
-            return context;
+    public HttpResponseMessage Response { get; set; } = new HttpResponseMessage();
+
+    private static void GetContent(HttpRequestMessage request)
+    {
+        var contentLength = long.Parse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ContentLength) ?? "0");
+
+        if (contentLength > 0)
+        {
+            var content = new byte[contentLength];
+
+            _ = Console.OpenStandardInput().Read(content, 0, (int)contentLength);
+
+            request.Content = new ByteArrayContent(content);
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ContentType) ?? string.Empty);
+            request.Content.Headers.ContentLength = contentLength;
         }
+    }
 
-        private static void GetContent(HttpRequestMessage request)
+    private static void LoadHttpHeadersFromEnvironment(HttpHeaders headers)
+    {
+        var envVariables = Environment.GetEnvironmentVariables();
+
+        var e = envVariables.GetEnumerator();
+        try
         {
-            var contentLength = long.Parse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ContentLength) ?? "0");
-
-            if (contentLength > 0)
+            while (e.MoveNext())
             {
-                var content = new byte[contentLength];
+                var entry = e.Entry;
+                var key = (string)entry.Key;
 
-                _ = Console.OpenStandardInput().Read(content, 0, (int)contentLength);
-
-                request.Content = new ByteArrayContent(content);
-                request.Content.Headers.ContentType = new MediaTypeHeaderValue(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ContentType) ?? string.Empty);
-                request.Content.Headers.ContentLength = contentLength;
-            }
-        }
-
-        private static void LoadHttpHeadersFromEnvironment(HttpHeaders headers)
-        {
-            var envVariables = Environment.GetEnvironmentVariables();
-
-            var e = envVariables.GetEnumerator();
-            try
-            {
-                while (e.MoveNext())
+                if (key.StartsWith(CgiEnvironmentVariable.HttpHeadersPrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    var entry = e.Entry;
-                    var key = (string)entry.Key;
-
-                    if (key.StartsWith(CgiEnvironmentVariable.HttpHeadersPrefix, StringComparison.OrdinalIgnoreCase))
-                    {
-                        key = key.Substring(CgiEnvironmentVariable.HttpHeadersPrefix.Length);
-                        headers.Add(key, (string?)entry.Value ?? string.Empty);
-                    }
+                    key = key.Substring(CgiEnvironmentVariable.HttpHeadersPrefix.Length);
+                    headers.Add(key, (string?)entry.Value ?? string.Empty);
                 }
             }
-            finally
-            {
-                (e as IDisposable)?.Dispose();
-            }
+        }
+        finally
+        {
+            (e as IDisposable)?.Dispose();
         }
     }
 }

@@ -1,13 +1,18 @@
 ﻿using Dotnet.Cgi;
 using Newtonsoft.Json.Linq;
 
-var context = CgiContext.GetInstance();
+var app = new CgiApp();
 
-var responseContent = new JObject
+app.Map(HttpMethod.Get, "/", async (context, parameters) =>
 {
-    ["env"] = JObject.FromObject(Environment.GetEnvironmentVariables()),
-    ["context"] = JObject.FromObject(context),
-    ["requestBody"] = context.Request.Content?.ReadAsStringAsync().Result,
-};
+    var responseContent = new JObject
+    {
+        ["env"] = JObject.FromObject(Environment.GetEnvironmentVariables()),
+        ["context"] = JObject.FromObject(context),
+        ["requestBody"] = context.Request.Content?.ReadAsStringAsync().Result,
+    };
 
-await context.Created(responseContent);
+    await context.Created(responseContent);
+});
+
+await app.Execute();
