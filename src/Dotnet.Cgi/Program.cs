@@ -10,4 +10,4 @@ var responseContent = new JObject
     ["requestBody"] = context.Request.Content?.ReadAsStringAsync().Result,
 };
 
-await CgiResult.Created(responseContent).ExecuteAsync(context);
+await context.Created(responseContent);

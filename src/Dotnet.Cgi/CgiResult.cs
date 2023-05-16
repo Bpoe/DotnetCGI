@@ -5,14 +5,6 @@
 
     public class CgiResult
     {
-        public static CgiResult Created(object? value = null) => new CgiResult(HttpStatusCode.Created, value);
-
-        public static CgiResult Ok(object? value = null) => new CgiResult(HttpStatusCode.OK, value);
-
-        public static CgiResult BadRequest(object? value = null) => new CgiResult(HttpStatusCode.BadRequest, value);
-
-        public static CgiResult NotFound(object? value = null) => new CgiResult(HttpStatusCode.NotFound, value);
-
         public HttpStatusCode StatusCode { get; }
 
         public object? Value { get; }
