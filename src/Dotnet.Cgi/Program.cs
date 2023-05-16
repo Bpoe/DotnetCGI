@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Dotnet.Cgi;
+﻿using Dotnet.Cgi;
 using Newtonsoft.Json.Linq;
 
 var context = CgiContext.GetInstance();
@@ -11,7 +10,4 @@ var responseContent = new JObject
     ["requestBody"] = context.Request.Content?.ReadAsStringAsync().Result,
 };
 
-context.Response.StatusCodeResult(HttpStatusCode.BadRequest, responseContent);
-context.Response.Headers.Add("X-foo", "bar");
-
-context.Response.WriteToConsole();
+await CgiResult.Created(responseContent).ExecuteAsync(context);

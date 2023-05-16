@@ -2,12 +2,40 @@
 {
     using System;
     using System.Net;
-    using System.Net.Http.Headers;
-    using Newtonsoft.Json;
 
-    public static class HttpMessageExtensions
+    public class CgiResult
     {
-        public static void WriteToConsole(this HttpResponseMessage response)
+        public static CgiResult Created(object? value = null) => new CgiResult(HttpStatusCode.Created, value);
+
+        public static CgiResult Ok(object? value = null) => new CgiResult(HttpStatusCode.OK, value);
+
+        public static CgiResult BadRequest(object? value = null) => new CgiResult(HttpStatusCode.BadRequest, value);
+
+        public static CgiResult NotFound(object? value = null) => new CgiResult(HttpStatusCode.NotFound, value);
+
+        public HttpStatusCode StatusCode { get; }
+
+        public object? Value { get; }
+
+        public CgiResult(HttpStatusCode statusCode, object? value)
+        {
+            StatusCode = statusCode;
+            Value = value;
+        }
+
+        public async Task ExecuteAsync(CgiContext context)
+        {
+            context.Response.StatusCode = this.StatusCode;
+
+            if (this.Value != null)
+            {
+                context.Response.Content = new JsonContent(this.Value);
+            }
+
+            await WriteToConsoleAsync(context.Response);
+        }
+
+        private async Task WriteToConsoleAsync(HttpResponseMessage response)
         {
             // If "Status: ..." is not returned, then 200 us assumed
             Console.WriteLine("Status: {0} {1}", (int)response.StatusCode, ReasonPhrases.GetReasonPhrase((int)response.StatusCode));
@@ -35,23 +63,12 @@
 
             if (response.Content != null)
             {
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
 
                 // Headers and content are separated by an empty line
                 Console.WriteLine();
                 Console.WriteLine(content);
             }
-        }
-
-        public static void StatusCodeResult(this HttpResponseMessage response, HttpStatusCode statusCode, object content)
-        {
-            var contentString = JsonConvert.SerializeObject(content);
-            response.StatusCode = statusCode;
-            response.Content = new StringContent(
-                contentString,
-                new MediaTypeHeaderValue("application/json"));
-
-            response.Content.Headers.ContentLength = contentString.Length;
         }
     }
 }
