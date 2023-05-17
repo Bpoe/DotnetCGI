@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/Bpoe/DotnetCGI</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dotnet.Cgi\Dotnet.Cgi.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

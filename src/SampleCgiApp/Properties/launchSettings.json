@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Dotnet.Cgi": {
+    "SampleCgiApp": {
       "commandName": "Project",
       "environmentVariables": {
         "REQUEST_METHOD": "Get"
