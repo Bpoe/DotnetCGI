@@ -1,6 +1,12 @@
 ﻿using Dotnet.Cgi;
 using Newtonsoft.Json.Linq;
 
+if (args.Length > 1)
+{
+    Environment.SetEnvironmentVariable(CgiEnvironmentVariable.RequestMethod, args[0]);
+    Environment.SetEnvironmentVariable(CgiEnvironmentVariable.RequestUri, args[1]);
+}
+
 var app = new CgiApp();
 
 app.Map(HttpMethod.Get, "/", async (context, parameters) =>
