@@ -45,7 +45,7 @@ public class CgiContext
 
     private static void GetContent(HttpRequestMessage request)
     {
-        var contentLength = long.Parse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ContentLength) ?? "0");
+        _ = long.TryParse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ContentLength), out var contentLength);
 
         if (contentLength > 0)
         {
