@@ -1,6 +1,5 @@
 ﻿namespace Dotnet.Cgi;
 
-using Dotnet.Cgi;
 using System;
 using System.Net.Http.Headers;
 
@@ -12,7 +11,7 @@ public class CgiContext
         {
             Port = int.Parse(Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ServerPort) ?? "0"),
             Path = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.RequestUri)
-                ?? Environment.GetEnvironmentVariable(CgiEnvironmentVariable.ScriptName) + Environment.GetEnvironmentVariable(CgiEnvironmentVariable.PathInfo),
+                ?? Environment.GetEnvironmentVariable(CgiEnvironmentVariable.PathInfo),
             Query = Environment.GetEnvironmentVariable(CgiEnvironmentVariable.QueryString) ?? string.Empty,
         };
 

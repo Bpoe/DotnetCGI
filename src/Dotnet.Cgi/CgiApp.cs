@@ -101,7 +101,7 @@ public class CgiApp
 
     private static async Task WriteToConsoleAsync(HttpResponseMessage response)
     {
-        // If "Status: ..." is not returned, then 200 us assumed
+        // If "Status: ..." is not returned, then 200 is assumed
         Console.WriteLine("Status: {0} {1}", (int)response.StatusCode, ReasonPhrases.GetReasonPhrase((int)response.StatusCode));
 
         var finalHeaders = new Dictionary<string, string>();

@@ -9,7 +9,7 @@ if (args.Length > 1)
 
 var app = new CgiApp();
 
-app.Map(HttpMethod.Get, "/", async (context, parameters) =>
+app.Map(HttpMethod.Get, "/cgi/SampleCgiApp.exe/", async (context, parameters) =>
 {
     var responseContent = new JObject
     {
