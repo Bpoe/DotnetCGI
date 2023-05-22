@@ -17,6 +17,7 @@
         public Task ExecuteAsync(CgiContext context)
         {
             context.Response.StatusCode = this.StatusCode;
+            context.Response.Headers.Date = DateTime.Now;
 
             if (this.Value != null)
             {

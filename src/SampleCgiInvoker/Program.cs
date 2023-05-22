@@ -4,7 +4,7 @@
 var handler = new CgiHttpMessageHandler("C:\\git\\dotnetCGI\\src\\SampleCgiApp\\bin\\Debug\\net7.0\\SampleCgiApp.exe");
 var client = new HttpClient(handler);
 
-var response = await client.GetAsync("http://localhost/");
+var response = await client.GetAsync("http://localhost/cgi/SampleCgiApp.exe/");
 
 // Write response to Console
 Console.WriteLine

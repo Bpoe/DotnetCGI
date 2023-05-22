@@ -63,7 +63,7 @@
                     break;
                 }
 
-                var keyValue = line.Split(':', StringSplitOptions.RemoveEmptyEntries & StringSplitOptions.TrimEntries);
+                var keyValue = line.Split(':', 2);
                 if (keyValue.Length != 2)
                 {
                     throw new InvalidOperationException();
