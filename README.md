@@ -6,22 +6,22 @@ Why? Why not? This was mostly just educational to see how CGI works as an IPC me
 
 Sample
 ```dotnetcli
-using System.Net;
-using System.Net.Http.Headers;
 using Dotnet.Cgi;
 using Newtonsoft.Json.Linq;
 
-var context = CgiContext.GetInstance();
+var app = new CgiApp();
 
-var responseContent = new JObject
+app.Map(HttpMethod.Get, "/cgi/SampleCgiApp.exe/", async (context, parameters) =>
 {
-    ["env"] = JObject.FromObject(Environment.GetEnvironmentVariables()),
-    ["context"] = JObject.FromObject(context),
-    ["requestBody"] = context.Request.Content?.ReadAsStringAsync().Result,
-};
+    var responseContent = new JObject
+    {
+        ["env"] = JObject.FromObject(Environment.GetEnvironmentVariables()),
+        ["context"] = JObject.FromObject(context),
+        ["requestBody"] = context.Request.Content?.ReadAsStringAsync().Result,
+    };
 
-context.Response.StatusCodeResult(HttpStatusCode.BadRequest, responseContent);
-context.Response.Headers.Add("X-foo", "bar");
+    await context.Created(responseContent);
+});
 
-context.Response.WriteToConsole();
+await app.Execute();
 ```
